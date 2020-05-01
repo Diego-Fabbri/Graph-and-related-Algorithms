@@ -1,0 +1,105 @@
+public class WUGraph {
+	/*RAPPRESENTAZIONE DI UN GRAFO PESATO CON LA MATRICE DI ADIACENZA DI DOUBLE
+	 * n=numero di nodi del grafo pesato
+	 * Si assume che i pesi possano avere valore positivo se arco esiste oppure 0 se arco non esiste 
+	 * LIMITE: un arco di peso uguale a zero non esiste, non si ammette caso di un arco di peso nullo esistente .
+	 * NB: implicitamente si suppone che la numerazione dei nodi vada da zero a salire usando numeri interi positivi
+	 * //NB:tale grafo non è orientato e ammette per ogni arco (s,t) un arco (t,s). Tale matrice sarà simmetrica */
+   
+	private double[][]  edges;  //matrice di adiacenza che contiene i pesi .
+ 
+    public WUGraph(int n) {//costruttore che crea matrice dei pesi del grafo prendendo in input il numero di nodi n del grafo
+       edges  = new double[n][n];//tale matrice inizialmente è vuota
+    }
+    public double[][] toMatrix() {//METODO DI CONVERSIONE DI UN GRAFO PESATO IN UN MATRICE DI REALI
+    	int n = edges.length; //salviamo in numero n di nodi del grafo considerato
+    	double[][] M = new double[n][n]; //creiamo una matrice di adiacenza di dimensione nxn
+    	for (int i=0; i<n; i++)//con i due cicli scorriamo la matrice
+    		for (int j=0; j<n; j++)
+    			if (edges[i][j] != 0)//se esiste arco (i,j) con un peso non nullo 
+    				M[i][j] = edges[i][j];//l'elemento in posizione (i,j) è pari proprio al peso dell'arco (i,j)
+    			else//se arco (i,j) non esiste
+    				M[i][j] = 0;// il peso si setta uguale a zero
+    	for (int i=0; i<n; i++)//si scorre la diagonale principale della matrice
+			M[i][i] = 0;//gli archi che vanno dal nodo i al nodo i hanno peso 0 poichè non esistono
+    	return M;
+    }
+    /*COMPLESSITA' DEL METODO toMatrix()
+     * O(n^2)=complessità spaziale e temporale poichè si scandisce una matrice quadrata nxn e si crea tale matrice di dimensione nxn */
+ 
+    public double[][] toBooleanMatrix() {//METODO DI CREAZIONE DI UNA MATRICE DI ADIACENZA DI BIT (SENZA ESPRESSIONE DEI PESI)
+    	int n = edges.length;//salviamo in numero n di nodi del grafo considerato
+    	double[][] M = new double[n][n];//creiamo una matrice di adiacenza di dimensione nxn
+    	for (int i=0; i<n; i++)//con i due cicli scorriamo la matrice
+    		for (int j=0; j<n; j++)
+    			if (edges[i][j] != 0)//se esiste arco (i,j),ovvero ha peso diverso da zero , si imposta elemento corrispondente nella matrice uguale ad 1
+    				M[i][j] = 1;
+    			else//se non esiste arco (i,j) si imposta elemento corrispondente nella matrice uguale ad 0
+    				M[i][j] = 0;
+    	return M;
+    }
+    /*COMPLESSITA' DEL METODO toBooleanMatrix()
+     * O(nxn)=complessità spaziale e temporale poichè si scandisce una matrice quadrata nxn e si crea tale matrice di dimensione nxn */
+    
+    public int size() { return edges.length; }// ci restitusce la misura del grafo intesa come numero di nodi presente ovvero la dimensione della matrice di adiacenza
+ 
+    public void addEdge(int source, int target, double w)  {//METODO DI AGGIUNTA DI UN ARCO (source,target) DI PESO w
+    	    if (isEdge(source,target))//se già arco esiste
+   		    System.out.println("Esiste già un arco da " + source + " a " + target);
+        else {//se arco non esiste
+	   	    edges[source][target] = w; //si settano elementi in poszione corrispondente uguale a w
+	   	    edges[target][source] = w;
+	   	    //NB:tale grafo non è orientato e ammette per ogni arco (s,t) un arco (t,s). Tale matrice sarà simmetrica
+        }
+    	}
+    
+    public boolean isEdge (int source, int target)  { //METODO DI VERIFICA DELL'ESISTENZA DI UN ARCO NODO SORGENTE E NODO DESTINAZIONE
+    		if(edges[source][target]>0);//se nella matrice l'elemento corrispondente all'arco preso in input è strettamente maggiore di zero
+    		    return true;//arco esiste
+    		else
+    			return false;//arco non esiste
+    	}
+    
+    
+    public void removeEdge(int source, int target)  { //METODO DI RIMOZIONE DI UN ARCO (source,target) 
+		edges[source][target] = 0; //si pongono le relative case con contenuto uguale a zero 
+		edges[target][source] = 0; 
+		//NB:tale grafo non è orientato e ammette per ogni arco (s,t) un arco (t,s). Tale matrice sarà simmetrica
+    	}
+    public double getWeight(int source, int target)  { //METODO DI RESTITUZIONE DEL PESO  DI UN ARCO (source,target) 
+    		return edges[source][target]; 
+    	}
+ 
+    public int[] neighbors(int vertex) {//METODO DI RESTITUZIONE DEI NODI ADIACENTI AD UN NODO PRESO IN INPUT
+       int count = 0;//si crea una variabile contatore per contare il numero di elementi adiacenti(archi in uscita dal nodo vertex)
+       for (int i=0; i<edges[vertex].length; i++) {//si scorre la riga del nodo vertex nella matrice
+          if (edges[vertex][i]>0) // se in tale riga ci sono elementi strettamente positivi , vuol dire che esiste un nodo adiacente e un arco che li collega
+        	  	count++;//si incrementa contatore
+       }
+       int[] answer = new int[count];//si crea un vettore contenente la risposta cercata,lista nodi adiaenti,di dimensione pari al numero di adiacenze trovare con contatore
+       count = 0;//azzeriamo nuovamente il contatore
+       for (int i=0; i<edges[vertex].length; i++) {//si scorre di nuovo la riga del nodo vertex nella matrice
+          if (edges[vertex][i]>0) // se in tale riga ci sono elementi strettamente positivi , vuol dire che esiste un nodo adiacente e un arco che li collega
+        	  	answer[count++] = i;// si copia nel vettore risposta il numero i del nodo adiacente
+       }
+       return answer;
+    }
+    /*COMPLESSITA' METODO neighbors(int vertex)
+     * O(n)=temporale. Si scandisce una riga della matrice per due volte creando un array(vettore adiacenze) a dimensione crescente.Nel caso peggiore avrà n-1 elementi
+     * (ovvero caso in cui nodo vertex è collegato a tutti gli altri n-1 nodi del grafo con un arco )
+     * O(1)= complessità spaziale */
+ 
+    public void print() {//METODO DI STAMPA DELLA MATRICE DI ADIACENZA
+       for (int j=0; j<edges.length; j++) {
+           System.out.print(j + ": ");
+           //* System.out.print(labels[j] + ": ");
+          for (int i=0; i<edges[j].length; i++) {
+             if (edges[j][i]>0) 
+            	    System.out.print("(" + j + "," + 
+                   i + "," + edges[j][i] + ") ");
+          }
+          System.out.println();
+       }
+    }
+
+}
